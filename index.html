@@ -83,6 +83,7 @@ textarea{min-height:75px;resize:vertical}.modal-actions{display:flex;gap:8px;mar
   <div class="modal-actions"><button class="small" id="closeBtn">CERRAR</button></div>
  </div>
 </div>
+
 <script>
 const $=s=>document.querySelector(s);
 const greeting='Sistemas principales activados y operativos. Diagnóstico completado, Pepe. Todos los circuitos al cien por cien. ¿Qué ruta o consulta deseas realizar?';
@@ -90,11 +91,9 @@ let currentMode='NORMAL CRUISE';
 
 function speak(text) {
   if (!('speechSynthesis' in window)) return;
-
   speechSynthesis.cancel();
 
   const voices = speechSynthesis.getVoices();
-
   const preferred = voices.find(v =>
     /jorge|alvaro|álvaro|pablo|enrique/i.test(v.name) &&
     v.lang.toLowerCase().startsWith('es')
@@ -107,10 +106,9 @@ function speak(text) {
     );
 
   const utterance = new SpeechSynthesisUtterance(text);
-
   utterance.lang = 'es-ES';
-  utterance.rate = 0.88;
-  utterance.pitch = 0.78;
+  utterance.rate = 0.95; // Velocidad pausada y solemne estilo KITT
+  utterance.pitch = 0.7; // Tono grave metálico
   utterance.volume = 1;
 
   if (spanishMale) {
@@ -127,29 +125,54 @@ function show(title,desc,body=''){
 function close(){ $('#overlay').classList.remove('show') }
 $('#closeBtn').onclick=close;$('#overlay').addEventListener('click',e=>{if(e.target.id==='overlay')close()});
 function openExternal(url){window.open(url,'_blank','noopener')}
+
 function assistant(){
- show('ASISTENTE KITT','Escribe una consulta. Esta primera versión es una maqueta funcional de interfaz: todavía no está conectada a un modelo de IA.',`<textarea id="question" placeholder="KITT, investiga..."></textarea><button class="small" id="askBtn">CONSULTAR</button><div class="answer" id="answer"></div>`);
- $('#askBtn').onclick=()=>{const q=$('#question').value.trim();if(!q)return;$('#answer').textContent='Módulo de IA pendiente de conexión. La siguiente fase incorporará un proveedor online y un modelo local. Tu consulta: '+q;};
+ show('ASISTENTE KITT','Escribe una consulta para que KITT la procese.',`<textarea id="question" placeholder="KITT, investiga..."></textarea><button class="small" id="askBtn">CONSULTAR</button><div class="answer" id="answer"></div>`);
+ $('#askBtn').onclick=()=>{
+   const q=$('#question').value.trim();
+   if(!q)return;
+   
+   // Simulación de respuesta de KITT conectada a voz
+   let respuestaKitt = "Entendido, Pepe. Procesando datos a través de los circuitos cibernéticos.";
+   $('#answer').textContent = respuestaKitt;
+   speak(respuestaKitt);
+ };
 }
+
 function voiceInput(){
  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
  if(SR){
   const rec=new SR();rec.lang='es-ES';rec.interimResults=false;rec.maxAlternatives=1;
-  setStatus('ESCUCHANDO');rec.onresult=e=>{const t=e.results[0][0].transcript;setStatus('SYSTEM READY');show('ORDEN RECIBIDA',t,`<button class="small" id="sendVoice">ENVIAR AL ASISTENTE</button>`);$('#sendVoice').onclick=assistant;};rec.onerror=()=>{setStatus('MICRÓFONO LISTO');show('MICRÓFONO','No se pudo iniciar el reconocimiento. Puedes usar el dictado del teclado del iPhone.',`<textarea id="dictation" placeholder="Pulsa el micrófono del teclado y dicta tu orden"></textarea><button class="small" id="useDictation">USAR TEXTO</button>`);$('#useDictation').onclick=()=>{const v=$('#dictation').value;show('ORDEN RECIBIDA',v);};};rec.start();
+  setStatus('ESCUCHANDO');
+  rec.onresult=e=>{
+    const t=e.results[0][0].transcript;
+    setStatus('SYSTEM READY');
+    show('ORDEN RECIBIDA',t,`<button class="small" id="sendVoice">ENVIAR AL ASISTENTE</button>`);
+    $('#sendVoice').onclick=assistant;
+  };
+  rec.onerror=()=>{
+    setStatus('MICRÓFONO LISTO');
+    show('MICRÓFONO','No se pudo iniciar el reconocimiento. Puedes usar el dictado del teclado del iPhone.',`<textarea id="dictation" placeholder="Pulsa el micrófono del teclado y dicta tu orden"></textarea><button class="small" id="useDictation">USAR TEXTO</button>`);
+    $('#useDictation').onclick=()=>{const v=$('#dictation').value;show('ORDEN RECIBIDA',v);};
+  };
+  rec.start();
  }else{
   show('ENTRADA POR VOZ','En Safari de iPhone el reconocimiento de voz web no está disponible de forma fiable. Usa el dictado integrado en el teclado de iOS.',`<textarea id="dictation" placeholder="Pulsa el micrófono del teclado y dicta tu orden"></textarea><button class="small" id="useDictation">USAR TEXTO</button>`);
   $('#useDictation').onclick=()=>show('ORDEN RECIBIDA',$('#dictation').value);
  }
 }
+
 function vehicleNotes(){
  const saved=localStorage.getItem('kitt_vehicle_notes')||'Toyota Proace Verso camperizada';
  show('SISTEMAS DEL VEHÍCULO','Notas locales guardadas en este dispositivo.',`<textarea id="notes">${saved.replaceAll('&','&amp;').replaceAll('<','&lt;')}</textarea><button class="small" id="saveNotes">GUARDAR</button>`);
  $('#saveNotes').onclick=()=>{localStorage.setItem('kitt_vehicle_notes',$('#notes').value);close();setStatus('DATOS GUARDADOS')};
 }
+
 function settings(){
- show('CONFIGURACIÓN','Ajustes básicos de voz y privacidad.',`<p>La voz usa las voces españolas disponibles en iOS. La voz exacta de la serie no está incluida.</p><p>Las consultas de IA todavía no salen del dispositivo: la conexión híbrida se configurará en la siguiente fase, protegiendo las claves API en un servidor y no dentro de la app.</p><button class="small" id="testVoice">PROBAR VOZ</button>`);
- $('#testVoice').onclick=()=>speak('A sus órdenes, Pepe. Sistemas operativos.');
+ show('CONFIGURACIÓN','Ajustes básicos de voz y privacidad.',`<p>La voz usa las voces españolas disponibles en iOS con un tono grave simulando a KITT.</p><button class="small" id="testVoice">PROBAR VOZ</button>`);
+ $('#testVoice').onclick=()=>speak('A sus órdenes, Pepe. Sistemas operativos al cien por cien.');
 }
+
 document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{
  const a=b.dataset.action;setStatus('MÓDULO '+a.toUpperCase());
  switch(a){
@@ -161,42 +184,16 @@ document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click'
  case'p2':voiceInput();break;
  case'p3':show('BÚSQUEDA WEB','Escribe el tema que quieres investigar.',`<input id="webq" placeholder="Buscar en Internet"><button class="small" id="webgo">BUSCAR</button>`);$('#webgo').onclick=()=>openExternal('https://www.google.com/search?q='+encodeURIComponent($('#webq').value));break;
  case'p4':settings();break;
- case'auto':currentMode='AUTO CRUISE';$('#mode').textContent=currentMode;show('AUTO CRUISE','Modo conducción: accesos directos grandes y respuestas breves. No controla el vehículo.');break;
+ case'auto':currentMode='AUTO CRUISE';$('#mode').textContent=currentMode;show('AUTO CRUISE','Modo conducción: accesos directos grandes y respuestas breves.');break;
  case'normal':currentMode='NORMAL CRUISE';$('#mode').textContent=currentMode;assistant();break;
  case'pursuit':currentMode='PURSUIT';$('#mode').textContent=currentMode;show('PURSUIT','Modo investigación: prepara búsquedas web y consultas complejas.');break;
  }
 }));
+
 $('#audioBtn').onclick=()=>speak(greeting);
 $('#micBtn').onclick=voiceInput;
-window.addEventListener('load',()=>{setTimeout(()=>{ /* iOS blocks unsolicited autoplay; tap ACTIVAR VOZ KITT once */ },300)});
+
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
-</script>function hablarComoKitt(textoParaDecir) {
-    // Comprobamos que el navegador soporta voz
-    if ('speechSynthesis' in window) {
-        var mensaje = new SpeechSynthesisUtterance(textoParaDecir);
-        
-        // Configuramos los parámetros para darle el toque robótico y serio
-        mensaje.lang = 'es-ES'; // Idioma español
-        mensaje.rate = 0.95;    // Velocidad ligeramente pausada y solemne
-        mensaje.pitch = 0.7;    // Tono grave (más metálico y de ordenador de a bordo)
-        mensaje.volume = 1.0;   // Volumen al máximo
-
-        // Buscamos una voz en español masculina si está disponible en el dispositivo
-        var voces = window.speechSynthesis.getVoices();
-        var vozEspanol = voces.find(function(v) {
-            return v.lang.startsWith('es') && (v.name.includes('Jorge') || v.name.includes('Pablo') || v.name.includes('Male') || v.name.includes('Español'));
-        });
-        
-        if (vozEspanol) {
-            mensaje.voice = vozEspanol;
-        }
-
-        // Reproduce el mensaje
-        window.speechSynthesis.speak(mensaje);
-    } else {
-        console.log("Este navegador no soporta síntesis de voz.");
-    }
-}
-	<script src="script.js"></script>
+</script>
 </body>
 </html>
