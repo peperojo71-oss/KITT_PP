@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KITT">
+<link rel="manifest" href="manifest.webmanifest">
+<title>KITT Personal</title>
+<style>
+:root{--red:#f01818;--yellow:#efff00;--orange:#ff792b;--blue:#124cff;--bg:#050505}
+*{box-sizing:border-box} html,body{margin:0;min-height:100%;background:#000;color:#fff;font-family:Arial,Helvetica,sans-serif}
+body{display:flex;justify-content:center;align-items:center;min-height:100svh;padding:14px}
+.app{width:min(100%,440px);min-height:min(900px,calc(100svh - 28px));background:radial-gradient(ellipse at 50% 35%,#171717 0,#090909 50%,#020202 100%);border:1px solid #222;border-radius:22px;padding:22px 17px 18px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 0 32px #111}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:2px;color:#777}
+.status{color:#f22}.scanner-wrap{height:110px;display:flex;align-items:center;justify-content:center;gap:7px;margin:12px 0 18px}
+.scanner{height:100%;width:30px;background:repeating-linear-gradient(to bottom,var(--red) 0 13px,transparent 13px 17px);filter:drop-shadow(0 0 5px #f00);animation:pulse 1.4s infinite alternate}
+.scanner.short{height:68%;width:27px}@keyframes pulse{from{opacity:.62}to{opacity:1}}
+.panel{display:grid;grid-template-columns:82px 1fr 82px;gap:10px;align-items:center}
+.side{display:flex;flex-direction:column;gap:17px}
+.pill{height:57px;border:0;border-radius:28px;background:var(--yellow);color:#050505;font-size:22px;font-weight:900;box-shadow:0 0 12px #eaff0033;cursor:pointer}
+.pill.red{background:#f02c16;color:#090000;box-shadow:0 0 12px #f20a0033}
+.center{display:flex;flex-direction:column;gap:11px}
+.cruise{border:0;border-radius:13px;min-height:53px;font-size:18px;line-height:1.03;font-weight:900;color:#050505;cursor:pointer;padding:7px 3px}
+.auto{background:var(--orange)}.normal{background:var(--yellow)}.pursuit{background:var(--blue);color:#000}
+button:active{transform:scale(.97);filter:brightness(1.3)}
+.greeting{font-size:12px;line-height:1.5;text-align:center;color:#bcbcbc;margin:20px 4px 12px;min-height:56px}
+.greeting strong{color:#fff}.actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.small{background:#171717;border:1px solid #444;border-radius:20px;color:#ddd;padding:9px 13px;font-size:11px;letter-spacing:.5px}
+.footer{display:flex;justify-content:space-between;color:#555;font-size:9px;letter-spacing:1.5px;margin-top:16px}
+.overlay{position:fixed;inset:0;background:#000d;display:none;align-items:center;justify-content:center;padding:18px;z-index:5}
+.overlay.show{display:flex}.modal{width:min(100%,430px);max-height:85svh;overflow:auto;background:#101010;border:1px solid #444;border-radius:18px;padding:18px;box-shadow:0 0 30px #000}
+.modal h2{margin:0 0 12px;color:var(--red);font-size:18px;letter-spacing:1px}
+.modal p{color:#ccc;font-size:13px;line-height:1.5}
+input,textarea{width:100%;background:#050505;color:#fff;border:1px solid #555;border-radius:9px;padding:12px;font:14px Arial;margin:7px 0}
+textarea{min-height:75px;resize:vertical}.modal-actions{display:flex;gap:8px;margin-top:10px}.modal-actions button{flex:1}
+.answer{white-space:pre-wrap;color:#eee;font-size:13px;line-height:1.5;margin-top:12px}
+@media(max-height:690px){.app{min-height:calc(100svh - 18px);padding:14px}.scanner-wrap{height:75px;margin:6px 0 10px}.side{gap:10px}.pill{height:48px}.cruise{min-height:46px}.greeting{margin:10px 4px}}
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="top"><span>KITT PERSONAL</span><span class="status" id="status">SYSTEM READY</span></div>
+  <div>
+    <div class="scanner-wrap" aria-label="Escáner KITT">
+      <div class="scanner short"></div><div class="scanner"></div><div class="scanner short"></div>
+    </div>
+    <section class="panel" aria-label="Cuadro de mandos">
+      <div class="side">
+        <button class="pill" data-action="air">AIR</button>
+        <button class="pill" data-action="oil">OIL</button>
+        <button class="pill red" data-action="p1">P1</button>
+        <button class="pill red" data-action="p2">P2</button>
+      </div>
+      <div class="center">
+        <button class="cruise auto" data-action="auto">AUTO<br>CRUISE</button>
+        <button class="cruise normal" data-action="normal">NORMAL<br>CRUISE</button>
+        <button class="cruise pursuit" data-action="pursuit">PURSUIT</button>
+      </div>
+      <div class="side">
+        <button class="pill" data-action="s1">S1</button>
+        <button class="pill" data-action="s2">S2</button>
+        <button class="pill red" data-action="p3">P3</button>
+        <button class="pill red" data-action="p4">P4</button>
+      </div>
+    </section>
+    <div class="greeting" id="greeting"><strong>Sistemas principales activados y operativos.</strong><br>Diagnóstico completado, Pepe. Todos los circuitos al cien por cien.<br>¿Qué ruta o consulta deseas realizar?</div>
+    <div class="actions">
+      <button class="small" id="audioBtn">ACTIVAR VOZ KITT</button>
+      <button class="small" id="micBtn">MICRÓFONO</button>
+    </div>
+  </div>
+  <div class="footer"><span>KNIGHT INDUSTRIES</span><span id="mode">NORMAL CRUISE</span><span>MK-I</span></div>
+</main>
+
+<div class="overlay" id="overlay">
+ <div class="modal">
+  <h2 id="modalTitle">KITT</h2>
+  <p id="modalDesc"></p>
+  <div id="modalBody"></div>
+  <div class="modal-actions"><button class="small" id="closeBtn">CERRAR</button></div>
+ </div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const greeting='Sistemas principales activados y operativos. Diagnóstico completado, Pepe. Todos los circuitos al cien por cien. ¿Qué ruta o consulta deseas realizar?';
+let currentMode='NORMAL CRUISE';
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+
+  speechSynthesis.cancel();
+
+  const voices = speechSynthesis.getVoices();
+
+  const preferred = voices.find(v =>
+    /jorge|alvaro|álvaro|pablo|enrique/i.test(v.name) &&
+    v.lang.toLowerCase().startsWith('es')
+  );
+
+  const spanishMale = preferred ||
+    voices.find(v =>
+      /male|masculin/i.test(v.name) &&
+      v.lang.toLowerCase().startsWith('es')
+    );
+
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  utterance.lang = 'es-ES';
+  utterance.rate = 0.88;
+  utterance.pitch = 0.78;
+  utterance.volume = 1;
+
+  if (spanishMale) {
+    utterance.voice = spanishMale;
+  }
+
+  speechSynthesis.speak(utterance);
+}
+
+function setStatus(s){$('#status').textContent=s}
+function show(title,desc,body=''){
+ $('#modalTitle').textContent=title;$('#modalDesc').textContent=desc;$('#modalBody').innerHTML=body;$('#overlay').classList.add('show');
+}
+function close(){ $('#overlay').classList.remove('show') }
+$('#closeBtn').onclick=close;$('#overlay').addEventListener('click',e=>{if(e.target.id==='overlay')close()});
+function openExternal(url){window.open(url,'_blank','noopener')}
+function assistant(){
+ show('ASISTENTE KITT','Escribe una consulta. Esta primera versión es una maqueta funcional de interfaz: todavía no está conectada a un modelo de IA.',`<textarea id="question" placeholder="KITT, investiga..."></textarea><button class="small" id="askBtn">CONSULTAR</button><div class="answer" id="answer"></div>`);
+ $('#askBtn').onclick=()=>{const q=$('#question').value.trim();if(!q)return;$('#answer').textContent='Módulo de IA pendiente de conexión. La siguiente fase incorporará un proveedor online y un modelo local. Tu consulta: '+q;};
+}
+function voiceInput(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(SR){
+  const rec=new SR();rec.lang='es-ES';rec.interimResults=false;rec.maxAlternatives=1;
+  setStatus('ESCUCHANDO');rec.onresult=e=>{const t=e.results[0][0].transcript;setStatus('SYSTEM READY');show('ORDEN RECIBIDA',t,`<button class="small" id="sendVoice">ENVIAR AL ASISTENTE</button>`);$('#sendVoice').onclick=assistant;};rec.onerror=()=>{setStatus('MICRÓFONO LISTO');show('MICRÓFONO','No se pudo iniciar el reconocimiento. Puedes usar el dictado del teclado del iPhone.',`<textarea id="dictation" placeholder="Pulsa el micrófono del teclado y dicta tu orden"></textarea><button class="small" id="useDictation">USAR TEXTO</button>`);$('#useDictation').onclick=()=>{const v=$('#dictation').value;show('ORDEN RECIBIDA',v);};};rec.start();
+ }else{
+  show('ENTRADA POR VOZ','En Safari de iPhone el reconocimiento de voz web no está disponible de forma fiable. Usa el dictado integrado en el teclado de iOS.',`<textarea id="dictation" placeholder="Pulsa el micrófono del teclado y dicta tu orden"></textarea><button class="small" id="useDictation">USAR TEXTO</button>`);
+  $('#useDictation').onclick=()=>show('ORDEN RECIBIDA',$('#dictation').value);
+ }
+}
+function vehicleNotes(){
+ const saved=localStorage.getItem('kitt_vehicle_notes')||'Toyota Proace Verso camperizada';
+ show('SISTEMAS DEL VEHÍCULO','Notas locales guardadas en este dispositivo.',`<textarea id="notes">${saved.replaceAll('&','&amp;').replaceAll('<','&lt;')}</textarea><button class="small" id="saveNotes">GUARDAR</button>`);
+ $('#saveNotes').onclick=()=>{localStorage.setItem('kitt_vehicle_notes',$('#notes').value);close();setStatus('DATOS GUARDADOS')};
+}
+function settings(){
+ show('CONFIGURACIÓN','Ajustes básicos de voz y privacidad.',`<p>La voz usa las voces españolas disponibles en iOS. La voz exacta de la serie no está incluida.</p><p>Las consultas de IA todavía no salen del dispositivo: la conexión híbrida se configurará en la siguiente fase, protegiendo las claves API en un servidor y no dentro de la app.</p><button class="small" id="testVoice">PROBAR VOZ</button>`);
+ $('#testVoice').onclick=()=>speak('A sus órdenes, Pepe. Sistemas operativos.');
+}
+document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{
+ const a=b.dataset.action;setStatus('MÓDULO '+a.toUpperCase());
+ switch(a){
+ case'air':openExternal('https://www.google.com/search?q=el+tiempo+en+Chiclana+de+la+Frontera');break;
+ case'oil':vehicleNotes();break;
+ case's1':openExternal('https://maps.apple.com/');break;
+ case's2':openExternal('https://music.amazon.es/');break;
+ case'p1':assistant();break;
+ case'p2':voiceInput();break;
+ case'p3':show('BÚSQUEDA WEB','Escribe el tema que quieres investigar.',`<input id="webq" placeholder="Buscar en Internet"><button class="small" id="webgo">BUSCAR</button>`);$('#webgo').onclick=()=>openExternal('https://www.google.com/search?q='+encodeURIComponent($('#webq').value));break;
+ case'p4':settings();break;
+ case'auto':currentMode='AUTO CRUISE';$('#mode').textContent=currentMode;show('AUTO CRUISE','Modo conducción: accesos directos grandes y respuestas breves. No controla el vehículo.');break;
+ case'normal':currentMode='NORMAL CRUISE';$('#mode').textContent=currentMode;assistant();break;
+ case'pursuit':currentMode='PURSUIT';$('#mode').textContent=currentMode;show('PURSUIT','Modo investigación: prepara búsquedas web y consultas complejas.');break;
+ }
+}));
+$('#audioBtn').onclick=()=>speak(greeting);
+$('#micBtn').onclick=voiceInput;
+window.addEventListener('load',()=>{setTimeout(()=>{ /* iOS blocks unsolicited autoplay; tap ACTIVAR VOZ KITT once */ },300)});
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script>
+</body></html>

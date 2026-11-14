@@ -1,0 +1,9 @@
+{
+  "name": "KITT Personal",
+  "short_name": "KITT",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#050505",
+  "description": "Panel personal KITT"
+}

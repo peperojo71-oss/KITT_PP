@@ -1,0 +1,32 @@
+KITT PERSONAL - PROTOTIPO 0.1
+
+CONTENIDO
+- index.html: interfaz del salpicadero y acciones iniciales.
+- manifest.webmanifest: configuración para instalar como web app.
+- sw.js: caché básica para abrir la interfaz sin conexión después de la primera carga.
+
+IMPORTANTE
+Esta es la primera base visual y funcional, no la aplicación terminada.
+La pantalla, saludo escrito, voz del navegador, enlaces a Mapas/Amazon Music,
+notas locales y navegación por botones están implementados.
+El módulo IA todavía NO está conectado a ningún modelo.
+El reconocimiento de voz web no es fiable/no está disponible en Safari iOS;
+el botón ofrece dictado del teclado como alternativa.
+
+DESARROLLO EN WINDOWS
+1. Descomprime la carpeta.
+2. Abre index.html en Edge o Chrome para probar la interfaz.
+3. Para instalar en iPhone, publica estos archivos en un alojamiento HTTPS
+   (por ejemplo GitHub Pages) y abre la dirección en Safari.
+4. En Safari: Compartir > Añadir a pantalla de inicio > Añadir.
+   Apple explica el proceso aquí:
+   https://support.apple.com/guide/iphone/turn-a-website-into-an-app-iph? 
+
+SIGUIENTE FASE
+- Elegir proveedor de IA online y modelo local compatible.
+- Crear backend privado para no exponer claves API.
+- Añadir reconocimiento de voz compatible con iPhone.
+- Afinar la voz sintética y el diseño respecto a la fotografía original.
+- Añadir configuración y accesos directos personalizables.
+
+No introduzcas claves API dentro de index.html.
