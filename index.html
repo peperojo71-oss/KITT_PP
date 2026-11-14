@@ -170,5 +170,33 @@ $('#audioBtn').onclick=()=>speak(greeting);
 $('#micBtn').onclick=voiceInput;
 window.addEventListener('load',()=>{setTimeout(()=>{ /* iOS blocks unsolicited autoplay; tap ACTIVAR VOZ KITT once */ },300)});
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
-</script>
-</body></html>
+</script>function hablarComoKitt(textoParaDecir) {
+    // Comprobamos que el navegador soporta voz
+    if ('speechSynthesis' in window) {
+        var mensaje = new SpeechSynthesisUtterance(textoParaDecir);
+        
+        // Configuramos los parámetros para darle el toque robótico y serio
+        mensaje.lang = 'es-ES'; // Idioma español
+        mensaje.rate = 0.95;    // Velocidad ligeramente pausada y solemne
+        mensaje.pitch = 0.7;    // Tono grave (más metálico y de ordenador de a bordo)
+        mensaje.volume = 1.0;   // Volumen al máximo
+
+        // Buscamos una voz en español masculina si está disponible en el dispositivo
+        var voces = window.speechSynthesis.getVoices();
+        var vozEspanol = voces.find(function(v) {
+            return v.lang.startsWith('es') && (v.name.includes('Jorge') || v.name.includes('Pablo') || v.name.includes('Male') || v.name.includes('Español'));
+        });
+        
+        if (vozEspanol) {
+            mensaje.voice = vozEspanol;
+        }
+
+        // Reproduce el mensaje
+        window.speechSynthesis.speak(mensaje);
+    } else {
+        console.log("Este navegador no soporta síntesis de voz.");
+    }
+}
+	<script src="script.js"></script>
+</body>
+</html>
